@@ -5,15 +5,10 @@ import * as React from 'react';
 const Search = (): React.Node => {
   const [searchInput, setSearchInput] = React.useState('');
   const [joke, setJoke] = React.useState('');
+  const [fetchingJoke, setFetchingJoke] = React.useState(false);
 
-  React.useEffect(() => {
-
-  },
-  [joke]);
-
-  const onTellJoke = (event) => {
-    event.preventDefault();
-    console.log('button press');
+  const fetchJoke = () => {
+    setFetchingJoke(true);
     fetch('https://icanhazdadjoke.com/', {
       method: 'GET',
       headers: {
@@ -21,11 +16,17 @@ const Search = (): React.Node => {
       },
     })
       .then((response) => response.json())
-      .then((json) => setJoke(json.joke));
-
+      .then((json) => {
+        setJoke(json.joke);
+        setFetchingJoke(false);
+      });
     setSearchInput('');
   };
 
+  const onTellJoke = (event) => {
+    event.preventDefault();
+    fetchJoke();
+  };
   const Styles = {
     container: {
       border: 'solid black',
@@ -51,12 +52,11 @@ const Search = (): React.Node => {
         style={Styles.input}
       />
       <div>
-        <button type="button" style={{ margin: 'auto' }} onClick={onTellJoke}>Search</button>
+        <button type="button" style={{ margin: 'auto' }} onClick={onTellJoke} disabled={fetchingJoke}>Search</button>
         <div style={Styles.divider} />
-        <button type="button" onClick={onTellJoke} style={{ margin: 'auto' }}>Tell Me A Joke</button>
+        <button type="button" onClick={onTellJoke} style={{ margin: 'auto' }} disabled={fetchingJoke}>Tell Me A Joke </button>
       </div>
-
-      {joke ? <div>{joke}</div> : null}
+      {fetchingJoke === true ? null : <div>{joke}</div>}
     </div>
   );
 };
